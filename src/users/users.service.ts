@@ -22,11 +22,11 @@ import { Tenancy } from 'src/tenancy/entities/tenancy.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
     @InjectRepository(PasswordResetToken)
-    private passwordResetTokenRepository: Repository<PasswordResetToken>,
+    private readonly passwordResetTokenRepository: Repository<PasswordResetToken>,
     @InjectRepository(Tenancy)
-    private tenancyRepository: Repository<Tenancy>,
+    private readonly tenancyRepository: Repository<Tenancy>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {

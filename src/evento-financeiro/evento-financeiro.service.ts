@@ -9,7 +9,7 @@ import { UpdateEventoFinanceiroDto } from './dto/update-evento-financeiro.dto';
 export class EventoFinanceiroService {
   constructor(
     @InjectRepository(EventoFinanceiro)
-    private eventoFinanceiroRepository: Repository<EventoFinanceiro>,
+    private readonly eventoFinanceiroRepository: Repository<EventoFinanceiro>,
   ) {}
 
   async create(

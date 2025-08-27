@@ -13,7 +13,7 @@ import { Plano } from './entities/plano.entity';
 export class PlanosService {
   constructor(
     @InjectRepository(Plano)
-    private planoRepository: Repository<Plano>,
+    private readonly planoRepository: Repository<Plano>,
   ) {}
 
   async create(createPlanoDto: CreatePlanoDto) {

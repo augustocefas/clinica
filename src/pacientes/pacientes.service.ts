@@ -10,9 +10,9 @@ import { Tenancy } from '../tenancy/entities/tenancy.entity';
 export class PacientesService {
   constructor(
     @InjectRepository(Paciente)
-    private pacienteRepository: Repository<Paciente>,
+    private readonly pacienteRepository: Repository<Paciente>,
     @InjectRepository(Tenancy)
-    private tenancyRepository: Repository<Tenancy>,
+    private readonly tenancyRepository: Repository<Tenancy>,
   ) {}
 
   async create(createPacienteDto: CreatePacienteDto) {

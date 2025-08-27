@@ -16,9 +16,9 @@ import { AgendaWithProcedimentos } from './interfaces/agenda-procedimento.interf
 export class AgendaService {
   constructor(
     @InjectRepository(Agenda)
-    private agendaRepository: Repository<Agenda>,
+    private readonly agendaRepository: Repository<Agenda>,
     @InjectRepository(AgendaProcedimentoTenancy)
-    private agendaProcedimentoRepository: Repository<AgendaProcedimentoTenancy>,
+    private readonly agendaProcedimentoRepository: Repository<AgendaProcedimentoTenancy>,
   ) {}
 
   async create(createAgendaDto: CreateAgendaDto) {

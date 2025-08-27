@@ -9,7 +9,7 @@ import { Profissional } from './entities/profissional.entity';
 export class ProfissionaisService {
   constructor(
     @InjectRepository(Profissional)
-    private profissionalRepository: Repository<Profissional>,
+    private readonly profissionalRepository: Repository<Profissional>,
   ) {}
 
   create(createProfissionalDto: CreateProfissionalDto) {

@@ -18,13 +18,13 @@ import { TipoDominioConfig } from './entities/tipo-dominio-config.entity';
 export class DominioService {
   constructor(
     @InjectRepository(Dominio)
-    private dominioRepository: Repository<Dominio>,
+    private readonly dominioRepository: Repository<Dominio>,
     @InjectRepository(TipoDominio)
-    private tipoDominioRepository: Repository<TipoDominio>,
+    private readonly tipoDominioRepository: Repository<TipoDominio>,
     @InjectRepository(DominioConfig)
-    private dominioConfigRepository: Repository<DominioConfig>,
+    private readonly dominioConfigRepository: Repository<DominioConfig>,
     @InjectRepository(TipoDominioConfig)
-    private tipoDominioConfigRepository: Repository<TipoDominioConfig>,
+    private readonly tipoDominioConfigRepository: Repository<TipoDominioConfig>,
   ) {}
 
   // CRUD para Dominio

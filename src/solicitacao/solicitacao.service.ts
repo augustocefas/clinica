@@ -13,7 +13,7 @@ import { Solicitacao } from './entities/solicitacao.entity';
 export class SolicitacaoService {
   constructor(
     @InjectRepository(Solicitacao)
-    private solicitacaoRepository: Repository<Solicitacao>,
+    private readonly solicitacaoRepository: Repository<Solicitacao>,
   ) {}
 
   async create(

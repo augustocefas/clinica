@@ -9,7 +9,7 @@ import { Tenancy } from './entities/tenancy.entity';
 export class TenancyService {
   constructor(
     @InjectRepository(Tenancy)
-    private tenancyRepository: Repository<Tenancy>,
+    private readonly tenancyRepository: Repository<Tenancy>,
   ) {}
 
   create(createTenancyDto: CreateTenancyDto) {

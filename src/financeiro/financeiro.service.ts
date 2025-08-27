@@ -9,7 +9,7 @@ import { UpdateFinanceiroDto } from './dto/update-financeiro.dto';
 export class FinanceiroService {
   constructor(
     @InjectRepository(Financeiro)
-    private financeiroRepository: Repository<Financeiro>,
+    private readonly financeiroRepository: Repository<Financeiro>,
   ) {}
 
   async create(createFinanceiroDto: CreateFinanceiroDto): Promise<Financeiro> {

@@ -21,9 +21,9 @@ import {
 export class SetoresService {
   constructor(
     @InjectRepository(Setor)
-    private setorRepository: Repository<Setor>,
+    private readonly setorRepository: Repository<Setor>,
     @InjectRepository(SetorProfissionalTenancy)
-    private setorProfissionalRepository: Repository<SetorProfissionalTenancy>,
+    private readonly setorProfissionalRepository: Repository<SetorProfissionalTenancy>,
   ) {}
 
   async create(createSetorDto: CreateSetorDto) {

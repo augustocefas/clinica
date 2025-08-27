@@ -9,7 +9,7 @@ import { PacienteLog } from './entities/paciente-log.entity';
 export class PacienteLogService {
   constructor(
     @InjectRepository(PacienteLog)
-    private pacienteLogRepository: Repository<PacienteLog>,
+    private readonly pacienteLogRepository: Repository<PacienteLog>,
   ) {}
 
   async create(
