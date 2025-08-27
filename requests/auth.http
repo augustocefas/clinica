@@ -1,3 +1,13 @@
+### VARIABLES ###
+# After login, copy the JWT token and set it here:
+@token = YOUR_JWT_TOKEN_HERE
+@userUuid = USER_UUID_HERE  
+@tenancyUuid = TENANCY_UUID_HERE
+@resetToken = RESET_TOKEN_HERE
+
+### AUTHENTICATION ENDPOINTS ###
+
+## 1. Create User (Public)
 POST http://localhost:3000/users
 Content-Type: application/json
 
@@ -9,7 +19,7 @@ Content-Type: application/json
 
 ###
 
-## login
+## 2. Login User (Public)
 POST http://localhost:3000/users/login
 Content-Type: application/json
 
@@ -17,3 +27,298 @@ Content-Type: application/json
     "email": "dougvil@msn.com",
     "password": "ABcd56!"
 }
+
+###
+
+### USER PROFILE ENDPOINTS ###
+
+## 3. Get User Profile (Protected)
+GET http://localhost:3000/users/profile
+Authorization: Bearer {{token}}
+
+###
+
+### USER MANAGEMENT ENDPOINTS ###
+
+## 4. Get All Users (Protected)
+GET http://localhost:3000/users
+Authorization: Bearer {{token}}
+
+###
+
+## 5. Get Users by Tenancy (Protected)
+GET http://localhost:3000/users?tenancy={{tenancyUuid}}
+Authorization: Bearer {{token}}
+
+###
+
+## 6. Get User Statistics (Protected)
+GET http://localhost:3000/users/statistics
+Authorization: Bearer {{token}}
+
+###
+
+## 7. Get User by Email (Protected)
+GET http://localhost:3000/users/email/dougvil@msn.com
+Authorization: Bearer {{token}}
+
+###
+
+## 8. Get User by UUID (Protected)
+GET http://localhost:3000/users/{{userUuid}}
+Authorization: Bearer {{token}}
+
+###
+
+## 9. Check User Access to Tenancy (Protected)
+GET http://localhost:3000/users/{{userUuid}}/access/{{tenancyUuid}}
+Authorization: Bearer {{token}}
+
+###
+
+## 10. Update User (Protected)
+PATCH http://localhost:3000/users/{{userUuid}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Douglas Updated",
+    "email": "dougvil.updated@msn.com"
+}
+
+###
+
+## 11. Update User Password (Protected)
+PATCH http://localhost:3000/users/{{userUuid}}/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentPassword": "ABcd56!",
+    "newPassword": "NewPass123!",
+    "confirmPassword": "NewPass123!"
+}
+
+###
+
+### TENANCY MANAGEMENT ENDPOINTS ###
+
+## 12. Add User to Tenancy (Protected)
+POST http://localhost:3000/users/{{userUuid}}/tenancy/{{tenancyUuid}}
+Authorization: Bearer {{token}}
+
+###
+
+## 13. Remove User from Tenancy (Protected)
+DELETE http://localhost:3000/users/{{userUuid}}/tenancy/{{tenancyUuid}}
+Authorization: Bearer {{token}}
+
+###
+
+### PASSWORD RESET ENDPOINTS ###
+
+## 14. Request Password Reset (Public)
+POST http://localhost:3000/users/password-reset/request
+Content-Type: application/json
+
+{
+    "email": "dougvil@msn.com"
+}
+
+###
+
+## 15. Reset Password (Public)
+POST http://localhost:3000/users/password-reset/reset
+Content-Type: application/json
+
+{
+    "email": "dougvil@msn.com",
+    "token": "{{resetToken}}",
+    "newPassword": "NewResetPass123!",
+    "confirmPassword": "NewResetPass123!"
+}
+
+###
+
+## 16. Validate Password Reset Token (Public)
+GET http://localhost:3000/users/password-reset/validate/dougvil@msn.com/{{resetToken}}
+
+###
+
+### USER DELETION ###
+
+## 17. Delete User (Protected)
+DELETE http://localhost:3000/users/{{userUuid}}
+Authorization: Bearer {{token}}
+
+###
+
+### USAGE INSTRUCTIONS ###
+# WORKFLOW:
+# 1. First create a user (endpoint 1)
+# 2. Login to get the token (endpoint 2) 
+# 3. Copy the JWT token from login response and update @token variable above
+# 4. Copy the user UUID from responses and update @userUuid variable above
+# 5. If testing tenancy features, update @tenancyUuid variable
+# 6. Run any protected endpoints
+# 7. For password reset, first request reset (endpoint 14), then get token from email/logs and update @resetToken
+
+## 1. Create User (Public)
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+    "name": "Douglas",
+    "email": "dougvil@msn.com",
+    "password": "ABcd56!"
+}
+
+###
+
+## 2. Login User (Public)
+POST http://localhost:3000/users/login
+Content-Type: application/json
+
+{
+    "email": "dougvil@msn.com",
+    "password": "ABcd56!"
+}
+
+###
+
+### USER PROFILE ENDPOINTS ###
+
+## 3. Get User Profile (Protected)
+GET http://localhost:3000/users/profile
+Authorization: Bearer {{token}}
+
+###
+
+### USER MANAGEMENT ENDPOINTS ###
+
+## 4. Get All Users (Protected)
+GET http://localhost:3000/users
+Authorization: Bearer {{token}}
+
+###
+
+## 5. Get Users by Tenancy (Protected)
+GET http://localhost:3000/users?tenancy=TENANCY_UUID_HERE
+Authorization: Bearer {{token}}
+
+###
+
+## 6. Get User Statistics (Protected)
+GET http://localhost:3000/users/statistics
+Authorization: Bearer {{token}}
+
+###
+
+## 7. Get User by Email (Protected)
+GET http://localhost:3000/users/email/dougvil@msn.com
+Authorization: Bearer {{token}}
+
+###
+
+## 8. Get User by UUID (Protected)
+GET http://localhost:3000/users/USER_UUID_HERE
+Authorization: Bearer {{token}}
+
+###
+
+## 9. Check User Access to Tenancy (Protected)
+GET http://localhost:3000/users/USER_UUID_HERE/access/TENANCY_UUID_HERE
+Authorization: Bearer {{token}}
+
+###
+
+## 10. Update User (Protected)
+PATCH http://localhost:3000/users/USER_UUID_HERE
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Douglas Updated",
+    "email": "dougvil.updated@msn.com"
+}
+
+###
+
+## 11. Update User Password (Protected)
+PATCH http://localhost:3000/users/USER_UUID_HERE/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentPassword": "ABcd56!",
+    "newPassword": "NewPass123!",
+    "confirmPassword": "NewPass123!"
+}
+
+###
+
+### TENANCY MANAGEMENT ENDPOINTS ###
+
+## 12. Add User to Tenancy (Protected)
+POST http://localhost:3000/users/USER_UUID_HERE/tenancy/TENANCY_UUID_HERE
+Authorization: Bearer {{token}}
+
+###
+
+## 13. Remove User from Tenancy (Protected)
+DELETE http://localhost:3000/users/USER_UUID_HERE/tenancy/TENANCY_UUID_HERE
+Authorization: Bearer {{token}}
+
+###
+
+### PASSWORD RESET ENDPOINTS ###
+
+## 14. Request Password Reset (Public)
+POST http://localhost:3000/users/password-reset/request
+Content-Type: application/json
+
+{
+    "email": "dougvil@msn.com"
+}
+
+###
+
+## 15. Reset Password (Public)
+POST http://localhost:3000/users/password-reset/reset
+Content-Type: application/json
+
+{
+    "email": "dougvil@msn.com",
+    "token": "RESET_TOKEN_HERE",
+    "newPassword": "NewResetPass123!",
+    "confirmPassword": "NewResetPass123!"
+}
+
+###
+
+## 16. Validate Password Reset Token (Public)
+GET http://localhost:3000/users/password-reset/validate/dougvil@msn.com/RESET_TOKEN_HERE
+
+###
+
+### USER DELETION ###
+
+## 17. Delete User (Protected)
+DELETE http://localhost:3000/users/USER_UUID_HERE
+Authorization: Bearer {{token}}
+
+###
+
+### EXAMPLE VARIABLES SETUP ###
+# You can use VS Code REST Client variables like this:
+# @token = YOUR_JWT_TOKEN_HERE
+# @userUuid = USER_UUID_HERE
+# @tenancyUuid = TENANCY_UUID_HERE
+# @resetToken = RESET_TOKEN_HERE
+
+### WORKFLOW EXAMPLE ###
+# 1. First create a user (endpoint 1)
+# 2. Login to get the token (endpoint 2)
+# 3. Copy the token and replace {{token}} in other requests
+# 4. Use the returned user UUID for protected endpoints
+# 5. Test other endpoints as needed
