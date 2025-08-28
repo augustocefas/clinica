@@ -4,10 +4,11 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { CreatePlanoDto } from './dto/create-plano.dto';
 import { UpdatePlanoDto } from './dto/update-plano.dto';
 import { Plano } from './entities/plano.entity';
+import { FindPlanosDto } from './dto/find-planos.dto';
 
 @Injectable()
 export class PlanosService {
@@ -32,16 +33,24 @@ export class PlanosService {
     return this.planoRepository.save(plano);
   }
 
-  findAll() {
+  findAll(findPlanosDto: FindPlanosDto) {
+    const { limit, offset } = findPlanosDto;
+
     return this.planoRepository.find({
       order: { nome: 'ASC' },
+      take: limit,
+      skip: offset,
     });
   }
 
-  findActive() {
+  findActive(findPlanosDto: FindPlanosDto) {
+    const { limit, offset } = findPlanosDto;
+
     return this.planoRepository.find({
-      where: { valor: { $gt: 0 } as any }, // Planos com valor > 0 considerados ativos
+      where: { valor: MoreThan(0) }, // Planos com valor > 0 considerados ativos
       order: { nome: 'ASC' },
+      take: limit,
+      skip: offset,
     });
   }
 

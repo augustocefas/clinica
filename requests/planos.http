@@ -1,0 +1,190 @@
+# Planos API Tests
+# Arquivo de testes para todos os endpoints do módulo Planos
+
+### 1. Criar um novo plano
+POST http://localhost:3000/planos
+Content-Type: application/json
+
+{
+  "nome": "Plano Gold III",
+  "valor": 1000.00,
+  "valorPromo": 80.00,
+  "integracaoWhatsapp": true,
+  "integracaoSms": false,
+  "integracaoEmail": true,
+  "integracaoApi": false,
+  "habilitaCliente": true,
+  "habilitaProduto": false,
+  "habilitaBotox": false,
+  "habilitaLaudo": true
+}
+
+### 2. Buscar todos os planos
+GET http://localhost:3000/planos
+
+### 2.1. Buscar todos os planos com paginação (limit 5)
+GET http://localhost:3000/planos
+?limit=5
+&offset=0
+
+### 2.2. Buscar todos os planos com paginação (limit 3, offset 2)
+GET http://localhost:3000/planos?limit=3&offset=2
+
+### 3. Buscar apenas planos ativos
+GET http://localhost:3000/planos?active=truelimit=50&offset=0
+
+### 3.1. Buscar planos ativos com paginação
+GET http://localhost:3000/planos?active=true&limit=2&offset=1
+
+### 4. Obter estatísticas dos planos
+GET http://localhost:3000/planos/statistics
+
+### 5. Buscar plano por nome
+GET http://localhost:3000/planos/search/nome/Plano%20Básico
+
+### 6. Buscar planos por faixa de preço
+GET http://localhost:3000/planos/search/price-range?min=50&max=150
+
+### 7. Buscar planos com features específicas - WhatsApp habilitado
+GET http://localhost:3000/planos/search/features?whatsapp=true
+
+### 8. Buscar planos com múltiplas features
+GET http://localhost:3000/planos/search/features?whatsapp=true&email=true&cliente=true
+
+### 9. Buscar planos sem features específicas
+GET http://localhost:3000/planos/search/features?sms=false&api=false
+
+### 10. Buscar planos com todas as features disponíveis
+GET http://localhost:3000/planos/search/features?whatsapp=true&sms=true&email=true&api=true&cliente=true&produto=true&botox=true&laudo=true
+
+### 11. Buscar plano por ID
+GET http://localhost:3000/planos/1
+
+### 12. Calcular preço de um plano sem promoção
+GET http://localhost:3000/planos/1/price
+
+### 13. Calcular preço de um plano com promoção
+GET http://localhost:3000/planos/1/price?promo=true
+
+### 14. Atualizar um plano parcialmente
+PATCH http://localhost:3000/planos/1
+Content-Type: application/json
+
+{
+  "nome": "Plano Básico Atualizado",
+  "valor": 120.00
+}
+
+### 15. Atualizar um plano completamente
+PATCH http://localhost:3000/planos/1
+Content-Type: application/json
+
+{
+  "nome": "Plano Premium",
+  "valor": 200.00,
+  "valorPromo": 150.00,
+  "integracaoWhatsapp": true,
+  "integracaoSms": true,
+  "integracaoEmail": true,
+  "integracaoApi": true,
+  "habilitaCliente": true,
+  "habilitaProduto": true,
+  "habilitaBotox": true,
+  "habilitaLaudo": true
+}
+
+### 16. Toggle feature - WhatsApp
+PATCH http://localhost:3000/planos/1/toggle/integracaoWhatsapp
+
+### 17. Toggle feature - SMS
+PATCH http://localhost:3000/planos/1/toggle/integracaoSms
+
+### 18. Toggle feature - Email
+PATCH http://localhost:3000/planos/1/toggle/integracaoEmail
+
+### 19. Toggle feature - API
+PATCH http://localhost:3000/planos/1/toggle/integracaoApi
+
+### 20. Toggle feature - Cliente
+PATCH http://localhost:3000/planos/1/toggle/habilitaCliente
+
+### 21. Toggle feature - Produto
+PATCH http://localhost:3000/planos/1/toggle/habilitaProduto
+
+### 22. Toggle feature - Botox
+PATCH http://localhost:3000/planos/1/toggle/habilitaBotox
+
+### 23. Toggle feature - Laudo
+PATCH http://localhost:3000/planos/1/toggle/habilitaLaudo
+
+### 24. Criar outro plano para testes
+POST http://localhost:3000/planos
+Content-Type: application/json
+
+{
+  "nome": "Plano Intermediário",
+  "valor": 150.00,
+  "valorPromo": 120.00,
+  "integracaoWhatsapp": true,
+  "integracaoSms": true,
+  "integracaoEmail": false,
+  "integracaoApi": false,
+  "habilitaCliente": true,
+  "habilitaProduto": true,
+  "habilitaBotox": false,
+  "habilitaLaudo": false
+}
+
+### 25. Criar plano avançado para testes
+POST http://localhost:3000/planos
+Content-Type: application/json
+
+{
+  "nome": "Plano Empresarial",
+  "valor": 300.00,
+  "valorPromo": 250.00,
+  "integracaoWhatsapp": true,
+  "integracaoSms": true,
+  "integracaoEmail": true,
+  "integracaoApi": true,
+  "habilitaCliente": true,
+  "habilitaProduto": true,
+  "habilitaBotox": true,
+  "habilitaLaudo": true
+}
+
+### 26. Teste de busca por faixa de preço específica
+GET http://localhost:3000/planos/search/price-range?min=100&max=200
+
+### 27. Teste de feature com apenas Botox habilitado
+GET http://localhost:3000/planos/search/features?botox=true
+
+### 28. Teste de feature com Laudo e API habilitados
+GET http://localhost:3000/planos/search/features?laudo=true&api=true
+
+### 29. Buscar plano por ID inexistente (deve retornar 404)
+GET http://localhost:3000/planos/999
+
+### 30. Tentar criar plano com nome duplicado (deve retornar 409)
+POST http://localhost:3000/planos
+Content-Type: application/json
+
+{
+  "nome": "Plano Básico",
+  "valor": 80.00
+}
+
+### 31. Tentar toggle de feature inválida (deve retornar erro)
+PATCH http://localhost:3000/planos/1/toggle/featureInvalida
+
+### 32. Excluir um plano
+DELETE http://localhost:3000/planos/2
+
+### 33. Tentar excluir plano inexistente (deve retornar 404)
+DELETE http://localhost:3000/planos/999
+
+### 34. Verificar estatísticas após criações/exclusões
+GET http://localhost:3000/planos/statistics
+
+### 35. Buscar todos os planos após operações
+GET http://localhost:3000/planos

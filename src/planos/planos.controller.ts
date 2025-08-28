@@ -12,6 +12,7 @@ import {
 import { PlanosService } from './planos.service';
 import { CreatePlanoDto } from './dto/create-plano.dto';
 import { UpdatePlanoDto } from './dto/update-plano.dto';
+import { FindPlanosDto } from './dto/find-planos.dto';
 
 @Controller('planos')
 export class PlanosController {
@@ -23,11 +24,11 @@ export class PlanosController {
   }
 
   @Get()
-  findAll(@Query('active') active?: string) {
-    if (active === 'true') {
-      return this.planosService.findActive();
+  findAll(@Query() findPlanosDto: FindPlanosDto) {
+    if (findPlanosDto.active === 'true') {
+      return this.planosService.findActive(findPlanosDto);
     }
-    return this.planosService.findAll();
+    return this.planosService.findAll(findPlanosDto);
   }
 
   @Get('statistics')
