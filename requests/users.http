@@ -1,0 +1,33 @@
+@baseUrl = http://localhost:3000
+@token = {{login.response.body.token}}
+
+##  Login User (Public)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "dougvil@msn.com",
+    "password": "M4ndrak3!"
+}
+###
+
+##  1. List Users
+# @name listUsers
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+###
+
+
+##  Upload User Photo
+# @name uploadUserPhoto
+POST {{baseUrl}}/users/fe066edf-1722-41e4-af8a-ac1aa5149402/photo
+Content-Type: multipart/form-data; boundary=BoundaryDelimitadorHttp
+Authorization: Bearer {{token}}
+
+--BoundaryDelimitadorHttp
+Content-Disposition: form-data; name="photo"; filename="avatar.jpg"
+Content-Type: image/jpeg
+
+< ./assets/avatar.jpg
+--BoundaryDelimitadorHttp--

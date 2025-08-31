@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import { TenancyModule } from 'src/tenancy/tenancy.module';
 import { PacientesModule } from 'src/pacientes/pacientes.module';
 import { ProfissionaisModule } from 'src/profissionais/profissionais.module';
@@ -20,30 +20,31 @@ import { EventoFinanceiroModule } from 'src/evento-financeiro/evento-financeiro.
 import { DominioModule } from 'src/dominio/dominio.module';
 import { PacienteLogModule } from 'src/paciente-log/paciente-log.module';
 import { SolicitacaoModule } from 'src/solicitacao/solicitacao.module';
+import appConfig from './app.config';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     // Carrega variáveis de ambiente e torna o ConfigService global
     ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: ['.env.local', '.env'],
+      load: [appConfig],
     }),
     // Usa ConfigService para configurar o TypeORM após carregar o .env
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST', 'localhost'),
-        port: parseInt(config.get<string>('DB_PORT', '5432'), 10),
-        username: config.get<string>('DB_USERNAME'),
-        database: config.get<string>('DB_DATABASE'),
-        password: config.get<string>('DB_PASSWORD'),
+      imports: [ConfigModule.forFeature(appConfig)],
+      inject: [appConfig.KEY],
+      useFactory: async ({ database }: ConfigType<typeof appConfig>) => ({
+        type: database.type as any,
+        host: database.host,
+        port: database.port,
+        username: database.username,
+        database: database.database,
+        password: database.password,
         autoLoadEntities: true,
-        // Sincroniza com o BD. Não deve ser usado em produção
-        synchronize: config.get<string>('NODE_ENV') !== 'production',
+        synchronize: database.synchronize,
       }),
     }),
+    AuthModule,
     TenancyModule,
     PacientesModule,
     ProfissionaisModule,

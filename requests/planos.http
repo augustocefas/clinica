@@ -1,5 +1,17 @@
 # Planos API Tests
 # Arquivo de testes para todos os endpoints do módulo Planos
+@token = {{login.response.body.token}}
+
+##  Login User (Public)
+# @name login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "dougvil@msn.com",
+    "password": "M4ndrak3!"
+}
+###
 
 ### 1. Criar um novo plano
 POST http://localhost:3000/planos
@@ -21,6 +33,7 @@ Content-Type: application/json
 
 ### 2. Buscar todos os planos
 GET http://localhost:3000/planos
+Authorization: Bearer {{token}}
 
 ### 2.1. Buscar todos os planos com paginação (limit 5)
 GET http://localhost:3000/planos

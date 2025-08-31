@@ -3,30 +3,24 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import { User } from './entities/user.entity';
-import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { Tenancy } from 'src/tenancy/entities/tenancy.entity';
+import { HashingService } from 'src/auth/hashing/hashing.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(PasswordResetToken)
-    private readonly passwordResetTokenRepository: Repository<PasswordResetToken>,
+
     @InjectRepository(Tenancy)
     private readonly tenancyRepository: Repository<Tenancy>,
+    private readonly hashingService: HashingService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -42,10 +36,8 @@ export class UsersService {
     }
 
     // Hash da senha
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(
+    const hashedPassword = await this.hashingService.hash(
       createUserDto.password,
-      saltRounds,
     );
 
     // Buscar tenancies se fornecidas
@@ -190,38 +182,14 @@ export class UsersService {
     return this.findOne(uuid);
   }
 
-  async updatePassword(uuid: string, updatePasswordDto: UpdatePasswordDto) {
-    const user = await this.userRepository.findOne({
-      where: { uuid },
-      select: ['uuid', 'password'],
-    });
+  async uploadPhoto(uuid: string, photo: Express.Multer.File) {
+    const user = await this.findOne(uuid);
 
     if (!user) {
       throw new NotFoundException(`Usuário com UUID ${uuid} não encontrado`);
     }
 
-    // Verificar senha atual
-    const isCurrentPasswordValid = await bcrypt.compare(
-      updatePasswordDto.currentPassword,
-      user.password,
-    );
-
-    if (!isCurrentPasswordValid) {
-      throw new UnauthorizedException('Senha atual incorreta');
-    }
-
-    // Hash da nova senha
-    const saltRounds = 10;
-    const hashedNewPassword = await bcrypt.hash(
-      updatePasswordDto.newPassword,
-      saltRounds,
-    );
-
-    await this.userRepository.update(uuid, {
-      password: hashedNewPassword,
-    });
-
-    return { message: 'Senha atualizada com sucesso' };
+    return { fieldname: photo.fieldname, filename: photo.originalname };
   }
 
   async addTenancy(userUuid: string, tenancyUuid: string) {
@@ -288,21 +256,6 @@ export class UsersService {
     return this.userRepository.delete(uuid);
   }
 
-  // Método para autenticação (validar credenciais)
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.userRepository.findOne({
-      where: { email },
-      select: ['uuid', 'name', 'email', 'password'],
-    });
-
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password: _, ...result } = user;
-      return result;
-    }
-    return null;
-  }
-
   // Verificar se usuário tem acesso a uma tenancy
   async hasAccessToTenancy(
     userUuid: string,
@@ -342,106 +295,5 @@ export class UsersService {
       withoutTenancy: total - withTenancy,
       avgTenanciesPerUser: parseFloat(avgTenanciesPerUser.avg) || 0,
     };
-  }
-
-  // Métodos para redefinição de senha
-  async requestPasswordReset(requestPasswordResetDto: RequestPasswordResetDto) {
-    const { email } = requestPasswordResetDto;
-
-    // Verificar se o usuário existe
-    const user = await this.userRepository.findOne({
-      where: { email },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`Usuário com email ${email} não encontrado`);
-    }
-
-    // Gerar token único
-    const token = crypto.randomBytes(32).toString('hex');
-
-    // Remover token anterior se existir
-    await this.passwordResetTokenRepository.delete({ email });
-
-    // Criar novo token
-    const passwordResetToken = this.passwordResetTokenRepository.create({
-      email,
-      token,
-    });
-
-    await this.passwordResetTokenRepository.save(passwordResetToken);
-
-    return {
-      message: 'Token de redefinição de senha criado com sucesso',
-      token, // Em produção, este token seria enviado por email
-    };
-  }
-
-  async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const { email, token, newPassword } = resetPasswordDto;
-
-    // Verificar se o token existe e é válido
-    const passwordResetToken = await this.passwordResetTokenRepository.findOne({
-      where: { email, token },
-    });
-
-    if (!passwordResetToken) {
-      throw new BadRequestException('Token inválido ou expirado');
-    }
-
-    // Verificar se o token não expirou (30 minutos)
-    const tokenAge =
-      new Date().getTime() - passwordResetToken.createdAt.getTime();
-    const thirtyMinutesInMs = 30 * 60 * 1000;
-
-    if (tokenAge > thirtyMinutesInMs) {
-      await this.passwordResetTokenRepository.delete({ email });
-      throw new BadRequestException('Token expirado');
-    }
-
-    // Buscar usuário
-    const user = await this.userRepository.findOne({
-      where: { email },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`Usuário com email ${email} não encontrado`);
-    }
-
-    // Hash da nova senha
-    const saltRounds = 10;
-    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-
-    // Atualizar senha
-    await this.userRepository.update(user.uuid, {
-      password: hashedNewPassword,
-    });
-
-    // Remover token usado
-    await this.passwordResetTokenRepository.delete({ email });
-
-    return { message: 'Senha redefinida com sucesso' };
-  }
-
-  async validatePasswordResetToken(email: string, token: string) {
-    const passwordResetToken = await this.passwordResetTokenRepository.findOne({
-      where: { email, token },
-    });
-
-    if (!passwordResetToken) {
-      return { valid: false, message: 'Token inválido' };
-    }
-
-    // Verificar se o token não expirou (30 minutos)
-    const tokenAge =
-      new Date().getTime() - passwordResetToken.createdAt.getTime();
-    const thirtyMinutesInMs = 30 * 60 * 1000;
-
-    if (tokenAge > thirtyMinutesInMs) {
-      await this.passwordResetTokenRepository.delete({ email });
-      return { valid: false, message: 'Token expirado' };
-    }
-
-    return { valid: true, message: 'Token válido' };
   }
 }
