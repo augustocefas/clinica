@@ -22,9 +22,19 @@ import { PacienteLogModule } from 'src/paciente-log/paciente-log.module';
 import { SolicitacaoModule } from 'src/solicitacao/solicitacao.module';
 import appConfig from './app.config';
 import { AuthModule } from 'src/auth/auth.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60,
+        limit: 60,
+        blockDuration: 5000,
+      },
+    ]),
+
     // Carrega variáveis de ambiente e torna o ConfigService global
     ConfigModule.forRoot({
       load: [appConfig],
@@ -64,7 +74,13 @@ import { AuthModule } from 'src/auth/auth.module';
     SolicitacaoModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
   exports: [],
 })
 export class AppModule {}
