@@ -35,3 +35,16 @@ Content-Type: application/json
 {
     "refreshToken": "{{refresh_token}}"
 }
+
+###
+
+POST {{baseUrl}}/home/sendEmail
+Content-Type: application/json
+
+{
+    "to": "test@nestjs.com",
+    "from": "noreply@nestjs.com",
+    "subject": "Testing Nest MailerModule ✔",
+    "text": "welcome",
+    "html": "<b>welcome</b>"
+}

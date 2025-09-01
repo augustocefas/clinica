@@ -11,5 +11,12 @@ export default registerAs('app', () => ({
     autoLoadEntities: true,
     synchronize: process.env.NODE_ENV !== 'production',
   },
+  smtp: {
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT, 10),
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+    from: process.env.SMTP_FROM,
+  },
   environment: process.env.NODE_ENV || 'development',
 }));

@@ -24,9 +24,16 @@ import appConfig from './app.config';
 import { AuthModule } from 'src/auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
   imports: [
+    // Carrega variáveis de ambiente e torna o ConfigService global
+    ConfigModule.forRoot({
+      load: [appConfig],
+    }),
+
     ThrottlerModule.forRoot([
       {
         ttl: 60,
@@ -35,11 +42,6 @@ import { APP_GUARD } from '@nestjs/core';
       },
     ]),
 
-    // Carrega variáveis de ambiente e torna o ConfigService global
-    ConfigModule.forRoot({
-      load: [appConfig],
-    }),
-    // Usa ConfigService para configurar o TypeORM após carregar o .env
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule.forFeature(appConfig)],
       inject: [appConfig.KEY],
@@ -54,6 +56,32 @@ import { APP_GUARD } from '@nestjs/core';
         synchronize: database.synchronize,
       }),
     }),
+
+    MailerModule.forRootAsync({
+      imports: [ConfigModule.forFeature(appConfig)],
+      inject: [appConfig.KEY],
+      useFactory: ({ smtp }: ConfigType<typeof appConfig>) => ({
+        transport: {
+          host: smtp.host,
+          port: smtp.port,
+          auth: {
+            user: smtp.user,
+            pass: smtp.pass,
+          },
+        },
+        defaults: {
+          from: smtp.from,
+        },
+        template: {
+          dir: __dirname + '/templates',
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+    }),
+
     AuthModule,
     TenancyModule,
     PacientesModule,
