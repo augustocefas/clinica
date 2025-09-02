@@ -10,11 +10,14 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
-    app.enableCors({
-      origin: 'http://localhost:5173',
-      credentials: true,
-    });
   }
+
+  const allowedOrigins =
+    process.env.CORS_ORIGINS?.split(',').map(origin => origin.trim()) || [];
+  app.enableCors({
+    origin: allowedOrigins,
+    credentials: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

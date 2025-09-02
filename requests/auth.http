@@ -15,6 +15,7 @@ Content-Type: application/json
     "email": "dougvil@msn.com",
     "password": "ABcd56!"
 }
+###
 
 ## 2. Login User (Public)
 # @name login
@@ -23,7 +24,7 @@ Content-Type: application/json
 
 {
     "email": "dougvil@msn.com",
-    "password": "M4ndrak3!"
+    "password": "ABcd56!"
 }
 ###
 
