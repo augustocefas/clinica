@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 
 export default registerAs('app', () => ({
   database: {
-    type: process.env.DB_TYPE || 'postgres',
+    type: (process.env.DB_TYPE as any) || 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT, 10) || 5432,
     username: process.env.DB_USERNAME,
@@ -10,6 +10,9 @@ export default registerAs('app', () => ({
     password: process.env.DB_PASSWORD,
     autoLoadEntities: true,
     synchronize: process.env.NODE_ENV !== 'production',
+    migrationsRun: process.env.NODE_ENV === 'production', // true em produção
+    migrations: ['dist/migrations/*{.ts,.js}'],
+    migrationsTableName: 'migrations',
   },
   smtp: {
     host: process.env.SMTP_HOST,

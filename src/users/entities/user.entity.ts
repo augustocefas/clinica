@@ -7,7 +7,8 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Tenancy } from 'src/tenancy/entities/tenancy.entity';
+
+import { Tenancy } from '@/tenancy/entities/tenancy.entity';
 
 @Entity('users')
 export class User {

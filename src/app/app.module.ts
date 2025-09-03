@@ -46,14 +46,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
       imports: [ConfigModule.forFeature(appConfig)],
       inject: [appConfig.KEY],
       useFactory: async ({ database }: ConfigType<typeof appConfig>) => ({
-        type: database.type as any,
-        host: database.host,
-        port: database.port,
-        username: database.username,
-        database: database.database,
-        password: database.password,
-        autoLoadEntities: true,
-        synchronize: database.synchronize,
+        ...database,
       }),
     }),
 
